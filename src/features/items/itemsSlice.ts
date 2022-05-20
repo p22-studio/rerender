@@ -1,38 +1,23 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { RootState } from "../../app/store";
-
 export type Item = { id: string; name: string };
 export type ItemsState = Record<string, Item>;
 
-const initialState: ItemsState = {
-  a: { id: "a", name: "a" },
-  b: { id: "b", name: "b" },
-  c: { id: "c", name: "c" },
-  d: { id: "d", name: "d" },
-  e: { id: "e", name: "e" },
-};
+const equal = (a: any, b: any) => JSON.stringify(a) === JSON.stringify(b);
 
-export const itemsSlice = createSlice({
-  name: "items",
-  initialState,
-  reducers: {
-    replace: (state, action: PayloadAction<ItemsState>) => action.payload,
-  },
-});
-
-export const { replace } = itemsSlice.actions;
-
-export const selectItems = (state: RootState) => {
+export const selectItems = (state: ItemsState) => {
   // console.log("selectItems");
-  return state.items;
+  return state;
 };
-export const selectItemIds = (state: RootState) => {
+let oldKeys: string[] | null = null;
+export const selectItemIds = (state: ItemsState) => {
   // console.log("selectItemIds");
-  return Object.keys(state.items);
+  const newKeys = Object.keys(state);
+  if (oldKeys && equal(oldKeys, newKeys)) {
+    return oldKeys;
+  }
+  oldKeys = newKeys;
+  return newKeys;
 };
-export const selectItemName = (state: RootState, id: string) => {
+export const selectItemName = (state: ItemsState, id: string) => {
   // console.log("selectItemName");
-  return state.items[id].name;
+  return state[id].name;
 };
-
-export default itemsSlice.reducer;

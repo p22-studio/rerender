@@ -1,16 +1,8 @@
-import React from "react";
+import React, { useContext } from "react";
 
-import { useAppSelector, useAppDispatch } from "../../app/hooks";
-import {
-  Item,
-  replace,
-  selectItemName,
-  selectItemIds,
-  selectItems,
-} from "./itemsSlice";
+import { Item, selectItemName, selectItemIds, selectItems } from "./itemsSlice";
 import styles from "./Items.module.css";
-
-const equal = (a: any, b: any) => JSON.stringify(a) === JSON.stringify(b);
+import { ItemsContext } from "../../app/store";
 
 const BasicItem = ({ item }: { item: Item }) => {
   console.log("🟦 Render BasicItem", item.id);
@@ -19,7 +11,8 @@ const BasicItem = ({ item }: { item: Item }) => {
 
 const BasicItems = () => {
   console.log("🟦 Render BasicItems list");
-  const items = useAppSelector(selectItems);
+  const { items: itemsState } = useContext(ItemsContext);
+  const items = selectItems(itemsState);
 
   return (
     <div className={styles.row}>
@@ -32,12 +25,14 @@ const BasicItems = () => {
 
 const SmartItem = ({ id }: { id: string }) => {
   console.log("🟧 Render SmartItem", id);
-  const item = useAppSelector((state) => selectItemName(state, id));
+  const { items: itemsState } = useContext(ItemsContext);
+  const item = selectItemName(itemsState, id);
   return <pre className={styles.value}>{item}</pre>;
 };
 const SmartItems = () => {
   console.log("🟧 Render SmartItems list");
-  const ids = useAppSelector(selectItemIds, equal);
+  const { items: itemsState } = useContext(ItemsContext);
+  const ids = selectItemIds(itemsState);
 
   return (
     <div className={styles.row}>
@@ -49,8 +44,8 @@ const SmartItems = () => {
 };
 
 function Actions() {
-  const dispatch = useAppDispatch();
-  const items = useAppSelector(selectItems);
+  const { items: itemsState, setItems } = useContext(ItemsContext);
+  const items = selectItems(itemsState);
 
   return (
     <div className={styles.row}>
@@ -59,7 +54,7 @@ function Actions() {
         onClick={() => {
           const newItems = { ...items };
           newItems.a = { id: "a", name: Math.random().toPrecision(3) };
-          return dispatch(replace(newItems));
+          return setItems(newItems);
         }}
       >
         Change A
