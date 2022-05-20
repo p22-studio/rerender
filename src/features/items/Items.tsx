@@ -13,12 +13,12 @@ import styles from "./Items.module.css";
 const equal = (a: any, b: any) => JSON.stringify(a) === JSON.stringify(b);
 
 const BasicItem = ({ item }: { item: Item }) => {
-  console.log("Render BasicItem", item.id);
+  console.log("🟦 Render BasicItem", item.id);
   return <pre className={styles.value}>{item.name}</pre>;
 };
 
 const BasicItems = () => {
-  console.log("Render BasicItems");
+  console.log("🟦 Render BasicItems list");
   const items = useAppSelector(selectItems);
 
   return (
@@ -31,12 +31,12 @@ const BasicItems = () => {
 };
 
 const SmartItem = ({ id }: { id: string }) => {
-  console.log("Render SmartItem", id);
-  const item = useAppSelector((state) => selectItemName(state, id), equal);
+  console.log("🟧 Render SmartItem", id);
+  const item = useAppSelector((state) => selectItemName(state, id));
   return <pre className={styles.value}>{item}</pre>;
 };
 const SmartItems = () => {
-  console.log("Render SmartItems");
+  console.log("🟧 Render SmartItems list");
   const ids = useAppSelector(selectItemIds, equal);
 
   return (
@@ -48,32 +48,32 @@ const SmartItems = () => {
   );
 };
 
-export function Items() {
-  console.log("Render Items");
+function Actions() {
   const dispatch = useAppDispatch();
+  const items = useAppSelector(selectItems);
 
-  const [json, setJson] = useState(`{
-  "a":{"id":"a", "name":"a"},
-  "b":{"id":"b", "name":"b"}
-}`);
+  return (
+    <div className={styles.row}>
+      <button
+        className={styles.button}
+        onClick={() => {
+          const newItems = { ...items };
+          newItems.a = { id: "a", name: Math.random().toPrecision(3) };
+          return dispatch(replace(newItems));
+        }}
+      >
+        Change A
+      </button>
+    </div>
+  );
+}
 
+export function Items() {
   return (
     <div>
       <BasicItems />
       <SmartItems />
-      <div className={styles.row}>
-        <button
-          className={styles.button}
-          onClick={() => dispatch(replace(JSON.parse(json)))}
-        >
-          Replace Items
-        </button>
-      </div>
-      <textarea
-        value={json}
-        onChange={(e) => setJson(e.target.value)}
-        style={{ width: "100vw", height: "12em" }}
-      />
+      <Actions />
     </div>
   );
 }
